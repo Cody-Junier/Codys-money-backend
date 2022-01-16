@@ -7,12 +7,37 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
+  Product.findAll({
+    include:[Category, Tag]
+  })
+  .then(dbProductData => res.json(dbProductData))
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err)
+    })
 });
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
+  Product.findOne({
+    where:{
+      id: req.params.id
+    },
+    include: [Category, Tag]
+  })
+  .then(dbCategoryData => {
+    if(!dbCategoryData){
+        res.status(400).json({message: 'No Product found with this id'});
+        return;
+    }
+    res.json(dbCategoryData);
+})
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err)
+    })
 });
 
 // create new product
@@ -24,6 +49,7 @@ router.post('/', (req, res) => {
       stock: 3,
       tagIds: [1, 2, 3, 4]
     }
+   
   */
   Product.create(req.body)
     .then((product) => {
@@ -82,7 +108,7 @@ router.put('/:id', (req, res) => {
         ProductTag.bulkCreate(newProductTags),
       ]);
     })
-    .then((updatedProductTags) => res.json(updatedProductTags))
+    .then((updatedProductTags) => res.status(200).json(updatedProductTags))
     .catch((err) => {
       // console.log(err);
       res.status(400).json(err);
@@ -91,6 +117,21 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  Product.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+  .then(dbCategoryData =>{ 
+    if(!dbCategoryData){
+      res.status(404).json({message: 'No Category of that id found'})
+      return;
+    }
+    res.json(dbCategoryData)})
+  .catch(err => {
+    console.log(err);
+    res.status(500).json(err)
+  })
 });
 
 module.exports = router;

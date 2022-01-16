@@ -3,7 +3,6 @@ const Product = require('./Product');
 const Category = require('./Category');
 const Tag = require('./Tag');
 const ProductTag = require('./ProductTag');
-const { belongsTo } = require('./Category');
 
 // Products belongsTo Category
 // Product belongs to Category, as a category can have multiple products but a product can only belong to one category.
